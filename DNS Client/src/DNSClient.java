@@ -33,7 +33,6 @@ public class DNSClient {
 		String dnsServerIp = (args.length == 2) ? args[1] : "8.8.8.8";
 
 		try {
-
 			// Build DNS query packet
 			byte[] query = buildQuery(hostname);
 
@@ -198,11 +197,8 @@ public class DNSClient {
 		System.out.println(";; ANSWER SECTION:");
 
 		for (int i = 0; i < anCount; i++) {
-
 			RRResult rr = readResourceRecord(msg, offset);
-
 			offset = rr.nextOffset;
-
 			System.out.println(rr.text);
 		}
 
@@ -212,11 +208,8 @@ public class DNSClient {
 		System.out.println(";; AUTHORITY SECTION:");
 
 		for (int i = 0; i < nsCount; i++) {
-
 			RRResult rr = readResourceRecord(msg, offset);
-
 			offset = rr.nextOffset;
-
 			System.out.println(rr.text);
 		}
 
@@ -224,7 +217,6 @@ public class DNSClient {
 
 		// ADDITIONAL SECTION
 		System.out.println(";; ADDITIONAL SECTION:");
-
 		for (int i = 0; i < arCount; i++) {
 			RRResult rr = readResourceRecord(msg, offset);
 			offset = rr.nextOffset;
