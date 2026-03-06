@@ -1,3 +1,9 @@
+/*
+ * Name: Shaun Stasuik
+ * Student Number: 20389739
+ * NetID = 22qh17
+ */
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.net.DatagramPacket;
@@ -85,7 +91,7 @@ public class DNSClient {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(baos);
 
-		// Generate random 16-bit identifier
+		// Generate random 16-bit identifier (2^16 = 65536)
 		int id = new Random().nextInt(65536);
 
 		// DNS HEADER
