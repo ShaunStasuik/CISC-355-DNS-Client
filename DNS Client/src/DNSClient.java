@@ -75,6 +75,10 @@ public class DNSClient {
 
 	/**
 	 * Builds a DNS query message in the correct binary format.
+	 * 
+	 * @param hostname the domain name to resolve (e.g. "www.google.com")
+	 * @return byte array representing the complete DNS query packet
+	 * @throws Exception if an error occurs during query construction
 	 */
 	private static byte[] buildQuery(String hostname) throws Exception {
 
@@ -122,6 +126,10 @@ public class DNSClient {
 
 	/**
 	 * Converts "www.example.com" into DNS label format: 3www7example3com0
+	 * 
+	 * @param out the output stream used to construct the DNS message
+	 * @param domain the domain name to encode
+	 * @throws Exception if a label exceeds the DNS maximum length (63 bytes)
 	 */
 	private static void writeDomainName(DataOutputStream out, String domain) throws Exception {
 
@@ -149,6 +157,9 @@ public class DNSClient {
 
 	/**
 	 * Parses the DNS response message and prints the sections.
+	 * 
+	 * @param msg byte array containing the raw DNS response message
+	 * @throws Exception if the response format is invalid or parsing fails
 	 */
 	private static void parseAndPrintResponse(byte[] msg) throws Exception {
 		int offset = 0;
@@ -226,6 +237,12 @@ public class DNSClient {
 
 	/**
 	 * Reads a resource record from the DNS message.
+	 * 
+	 * @param msg byte array containing the DNS message
+	 * @param offset position within the message where the record begins
+	 * @return RRResult object containing the formatted record text and
+	 *         the offset of the next record in the message
+	 * @throws Exception if parsing fails
 	 */
 	private static RRResult readResourceRecord(byte[] msg, int offset) throws Exception {
 		NameResult nameResult = readDomainName(msg, offset);
@@ -267,6 +284,12 @@ public class DNSClient {
 
 	/**
 	 * Reads a domain name from the DNS message. Handles compression pointers.
+	 * 
+	 * @param msg byte array containing the DNS message
+	 * @param offset position where the domain name begins
+	 * @return NameResult containing the decoded name and the next offset
+	 *         after the name field
+	 * @throws Exception if the name format is invalid
 	 */
 	private static NameResult readDomainName(byte[] msg, int offset) throws Exception {
 
@@ -320,20 +343,51 @@ public class DNSClient {
 		return new NameResult(name.toString(), nextOffset);
 	}
 
+	
+	/**
+	 * Reads a 16-bit unsigned integer from the DNS message.
+	 *
+	 * @param msg byte array containing the DNS message
+	 * @param offset position of the 16-bit field
+	 * @return unsigned integer value in the range 0–65535
+	 */
 	private static int readUnsignedShort(byte[] msg, int offset) {
 		return ((msg[offset] & 0xFF) << 8) | (msg[offset + 1] & 0xFF);
 	}
 
+	/**
+	 * Reads a 32-bit unsigned integer from the DNS message.
+	 *
+	 * @param msg byte array containing the DNS message
+	 * @param offset position of the 32-bit field
+	 * @return unsigned 32-bit value as a long
+	 */
 	private static long readUnsignedInt(byte[] msg, int offset) {
 		return ((long) (msg[offset] & 0xFF) << 24) | ((long) (msg[offset + 1] & 0xFF) << 16)
 				| ((long) (msg[offset + 2] & 0xFF) << 8) | ((long) (msg[offset + 3] & 0xFF));
 	}
 
+	
+	/**
+	 * Converts four bytes from the DNS message into a dotted IPv4 string.
+	 *
+	 * @param msg byte array containing the DNS message
+	 * @param offset starting position of the IPv4 address
+	 * @return human-readable IPv4 address string
+	 */
 	private static String ipv4ToString(byte[] msg, int offset) {
 		return (msg[offset] & 0xFF) + "." + (msg[offset + 1] & 0xFF) + "." + (msg[offset + 2] & 0xFF) + "."
 				+ (msg[offset + 3] & 0xFF);
 	}
 
+	/**
+	 * Converts a sequence of bytes into a hexadecimal string.
+	 *
+	 * @param msg byte array containing the DNS message
+	 * @param offset starting position of the byte sequence
+	 * @param len number of bytes to convert
+	 * @return hexadecimal string representation of the data
+	 */
 	private static String bytesToHex(byte[] msg, int offset, int len) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < len; i++) {
@@ -345,6 +399,12 @@ public class DNSClient {
 		return sb.toString();
 	}
 
+	/**
+	 * Converts a DNS record type number into a readable string.
+	 *
+	 * @param type numeric DNS record type
+	 * @return string representation of the type
+	 */
 	private static String typeToString(int type) {
 		switch (type) {
 		case TYPE_A:
@@ -358,6 +418,12 @@ public class DNSClient {
 		}
 	}
 
+	/**
+	 * Converts a DNS class number into a readable string.
+	 *
+	 * @param rrClass numeric DNS class value
+	 * @return string representation of the class
+	 */
 	private static String classToString(int rrClass) {
 		if (rrClass == CLASS_IN)
 			return "IN";
